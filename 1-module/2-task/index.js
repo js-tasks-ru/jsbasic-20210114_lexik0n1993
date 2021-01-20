@@ -12,7 +12,14 @@ function print(text) {
  * @returns {boolean}
  */
 function isValid(name) {
-  // ваш код...
+  if (name === null) {
+    return false;
+  }
+  
+  const isEmpty = name.trim() === '';
+  const isWithSpace = name.includes(' ');
+  const isShort = name.length < 4;
+  return !isEmpty && !isWithSpace && !isShort;
 }
 
 function sayHello() {
