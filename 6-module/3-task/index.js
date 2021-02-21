@@ -6,8 +6,12 @@ export default class Carousel {
 
     this.createCarouselBody();
     this.createCarouselSlides();
-    this.createAddPlusHanlder();
+
     this.initCarousel();
+
+    this.prevArrow.addEventListener('click', this.prevArrowHandler);
+    this.nextArrow.addEventListener('click', this.nextArrowHandler);
+    this.elem.addEventListener('click', this.addProduct);
   }
 
   createCarouselBody() {
@@ -62,19 +66,33 @@ export default class Carousel {
     return createElement(slideHTML);
   }
 
-  createAddPlusHanlder() {
-    this.elem.addEventListener('click', evt => {
-      if (evt.target.classList.contains('carousel__button') ||
-        evt.target.parentElement.classList.contains('carousel__button')
-      ) {
-        const productCard = evt.target.closest('.carousel__slide');
+  addProduct = (evt) => {
+    if (evt.target.classList.contains('carousel__button') ||
+      evt.target.parentElement.classList.contains('carousel__button')
+    ) {
+      const productCard = evt.target.closest('.carousel__slide');
 
-        this.elem.dispatchEvent(new CustomEvent('product-add', {
-          detail: productCard.dataset.id,
-          bubbles: true
-        }));
-      }
-    });
+      this.elem.dispatchEvent(new CustomEvent('product-add', {
+        detail: productCard.dataset.id,
+        bubbles: true
+      }));
+    }
+  }
+
+  prevArrowHandler = () => {
+    if (this.activeSlide > 1) {
+      this.moveCarousel(false);
+      this.activeSlide--;
+      this.hideArrowBtns();
+    }
+  }
+
+  nextArrowHandler = () => {
+    if (this.activeSlide < this.slidesLength) {
+      this.moveCarousel(true);
+      this.activeSlide++;
+      this.hideArrowBtns();
+    }
   }
 
   initCarousel() {
@@ -83,22 +101,6 @@ export default class Carousel {
     this.carouselRoad = this.elem.querySelector('.carousel__inner');
     this.slidesLength = this.carouselRoad.querySelectorAll('.carousel__slide').length;
     this.activeSlide = 1;
-
-    this.prevArrow.addEventListener('click', () => {
-      if (this.activeSlide > 1) {
-        this.moveCarousel(false);
-        this.activeSlide--;
-        this.hideArrowBtns();
-      }
-    });
-
-    this.nextArrow.addEventListener('click', () => {
-      if (this.activeSlide < this.slidesLength) {
-        this.moveCarousel(true);
-        this.activeSlide++;
-        this.hideArrowBtns();
-      }
-    });
 
     this.hideArrowBtns();
   }
@@ -111,7 +113,7 @@ export default class Carousel {
     this.carouselRoad.style.transform = `translateX(${newTranslate}px)`;
   }
 
-  hideArrowBtns() {
+  hideArrowBtns = () => {
     if (this.activeSlide === 1) {
       this.prevArrow.style.display = 'none';
     } else {
