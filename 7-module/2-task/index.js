@@ -3,7 +3,14 @@ import createElement from '../../assets/lib/create-element.js';
 export default class Modal {
   constructor() {
     this.createModal();
-    this.addModalHanlders();
+
+    this.closeButton.addEventListener('click', () => this.close());
+
+    document.addEventListener('keydown', evt => {
+      if (evt.code === 'Escape') {
+        this.close();
+      }
+    });
   }
 
   createModal() {
@@ -51,15 +58,5 @@ export default class Modal {
   setBody(bodyElement) {
     this.modalBody.innerHTML = ``;
     this.modalBody.insertAdjacentElement('beforeend', bodyElement);
-  }
-
-  addModalHanlders() {
-    this.closeButton.addEventListener('click', () => this.close());
-
-    document.addEventListener('keydown', evt => {
-      if (evt.code === 'Escape') {
-        this.close();
-      }
-    });
   }
 }

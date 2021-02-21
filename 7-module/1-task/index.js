@@ -7,9 +7,16 @@ export default class RibbonMenu {
 
     this.createRibbonBody();
     this.createRibbonItems();
-    this.addRibbonArrowsHanlders();
-    this.addRibbonScrollHanlder();
-    this.addRibbonClickHandler();
+
+    this.arrowPrevHanlder = this.arrowPrevHanlder.bind(this);
+    this.arrowNextHanlder = this.arrowNextHanlder.bind(this);
+    this.ribbonScrollHanlder = this.ribbonScrollHanlder.bind(this);
+    this.ribbonClickHandler = this.ribbonClickHandler.bind(this);
+
+    this.arrowPrev.addEventListener('click', this.arrowPrevHanlder);
+    this.arrowNext.addEventListener('click', this.arrowNextHanlder);
+    this.ribbonInner.addEventListener('scroll', this.ribbonScrollHanlder);
+    this.elem.addEventListener('click', this.ribbonClickHandler);
   }
 
   createRibbonBody() {
@@ -26,12 +33,17 @@ export default class RibbonMenu {
     `;
 
     this.elem = createElement(html);
+    this.arrowPrev = this.elem.querySelector('.ribbon__arrow_left');
+    this.arrowNext = this.elem.querySelector('.ribbon__arrow_right');
   }
 
   createRibbonItems() {
     this.ribbonInner = this.elem.querySelector('.ribbon__inner');
 
-    this.categories.forEach(({id, name}, index) => {
+    this.categories.forEach(({
+      id,
+      name
+    }, index) => {
       const categoryHtml = `
         <a href="#" class="ribbon__item${index === 0 ? ' ribbon__item_active' : ''}" data-id="${id}">${name}</a>
       `;
@@ -41,27 +53,25 @@ export default class RibbonMenu {
     });
   }
 
-  addRibbonArrowsHanlders() {
-    this.arrowPrev = this.elem.querySelector('.ribbon__arrow_left');
-    this.arrowNext = this.elem.querySelector('.ribbon__arrow_right');
+  arrowPrevHanlder() {
+    this.scrollRibbon(false);
+  }
 
-    this.arrowPrev.addEventListener('click', () => this.scrollRibbon(false));
-    this.arrowNext.addEventListener('click', () => this.scrollRibbon(true));
+  arrowNextHanlder() {
+    this.scrollRibbon(true)
   }
 
   scrollRibbon(direction) {
     this.ribbonInner.scrollBy((direction ? 1 : -1) * this.ribbonScrollDistance, 0);
   }
 
-  addRibbonScrollHanlder() {
-    this.ribbonInner.addEventListener('scroll', () => {
-      const scrollLeft = this.ribbonInner.scrollLeft;
-      const scrollWidth = this.ribbonInner.scrollWidth;
-      const clientWidth = this.ribbonInner.clientWidth;
-      const scrollRight = scrollWidth - scrollLeft - clientWidth;
+  ribbonScrollHanlder() {
+    const scrollLeft = this.ribbonInner.scrollLeft;
+    const scrollWidth = this.ribbonInner.scrollWidth;
+    const clientWidth = this.ribbonInner.clientWidth;
+    const scrollRight = scrollWidth - scrollLeft - clientWidth;
 
-      this.hideRibbonArrowButtons(scrollLeft, scrollRight);
-    });
+    this.hideRibbonArrowButtons(scrollLeft, scrollRight);
   }
 
   hideRibbonArrowButtons(scrollLeft, scrollRight) {
@@ -78,21 +88,19 @@ export default class RibbonMenu {
     }
   }
 
-  addRibbonClickHandler() {
-    this.elem.addEventListener('click', evt => {
-      if (evt.target.classList.contains('ribbon__item')) {
-        evt.preventDefault();
+  ribbonClickHandler(evt) {
+    if (evt.target.classList.contains('ribbon__item')) {
+      evt.preventDefault();
 
-        const targetItem = evt.target;
-        this.toggleActiveElement(targetItem);
+      const targetItem = evt.target;
+      this.toggleActiveElement(targetItem);
 
-        const id = this.activeElement.dataset.id;
-        this.elem.dispatchEvent(new CustomEvent('ribbon-select', {
-          detail: id,
-          bubbles: true
-        }));
-      }
-    });
+      const id = this.activeElement.dataset.id;
+      this.elem.dispatchEvent(new CustomEvent('ribbon-select', {
+        detail: id,
+        bubbles: true
+      }));
+    }
   }
 
   toggleActiveElement(newItem) {
