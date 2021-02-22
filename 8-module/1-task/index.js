@@ -38,7 +38,64 @@ export default class CartIcon {
     window.addEventListener('resize', () => this.updatePosition());
   }
 
+  setInitialTopCoord() {
+    const {top: topCoord} = this.elem.getBoundingClientRect();
+    this.initialTopCoord = topCoord + window.pageYOffset;
+  }
+
+  getLeftIndent() {
+    const leftIndent = Math.min(
+      document.querySelector('.container').getBoundingClientRect().right + 20,
+      document.documentElement.clientWidth - this.elem.offsetWidth - 10
+    );
+
+    return leftIndent;
+  }
+
+  setCartStyles(styles) {
+    Object.assign(this.elem.style, styles);
+  }
+
+  setCartFixed() {
+    const leftIndent = this.getLeftIndent();
+    const styles = {
+      position: `fixed`,
+      top: `50px`,
+      zIndex: 1000,
+      right: `10px`,
+      left: `${leftIndent}px`
+    };
+
+    this.setCartStyles(styles);
+  }
+
+  setCartDefault() {
+    const styles = {
+      position: ``,
+      top: ``,
+      zIndex: ``,
+      left: ``,
+      right: ``
+    };
+
+    this.setCartStyles(styles);
+  }
+
   updatePosition() {
-    // ваш код ...
+    if (!this.initialTopCoord) {
+      this.setInitialTopCoord();
+    }
+
+    const isMobile = document.documentElement.clientWidth <= 767;
+    if (isMobile) {
+      this.setCartDefault();
+      return;
+    }
+
+    if (window.pageYOffset > this.initialTopCoord) {
+      this.setCartFixed();
+    } else {
+      this.setCartDefault();
+    }
   }
 }
