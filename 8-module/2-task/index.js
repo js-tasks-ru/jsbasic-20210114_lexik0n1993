@@ -42,7 +42,9 @@ export default class ProductGrid {
     let filteredProducts = this.products;
 
     if (noNuts) {
-      filteredProducts = filteredProducts.filter(product => !product.nuts || product.nuts === false);
+      filteredProducts = filteredProducts.filter(product => {
+        return product.nuts === undefined || product.nuts === false;
+      });
     }
 
     if (vegeterianOnly) {
